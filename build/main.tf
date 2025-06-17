@@ -70,6 +70,7 @@ resource "google_cloudbuild_trigger" "build-trigger" {
       name = "gcr.io/cloud-builders/docker"
       args = ["build", "-t", "us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage", "."]
     }
+    images = ["us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage"]
   }
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 }

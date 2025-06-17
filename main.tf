@@ -11,7 +11,12 @@ resource "google_service_account" "default" {
 
 resource "google_project_iam_member" "storage_admin_member" {
   project = var.PROJECT_ID
-  role    = "roles/storage.admin"
+    for_each = toset([
+    "roles/storage.admin",
+    "roles/artifactregistry.writer",
+    "roles/logging.logWriter"
+  ])
+  role    = each.key
   member  = "serviceAccount:${google_service_account.default.email}"
 }
 
