@@ -22,7 +22,7 @@ resource "google_secret_manager_secret_version" "github-token-secret-version" {
 data "google_iam_policy" "p4sa-secretAccessor" {
   binding {
     role = "roles/secretmanager.secretAccessor"
-    // Here, 123456789 is the Google Cloud project number for the project that contains the connection.
+    #TODO Make ID a Var
     members = ["serviceAccount:service-539035393972@gcp-sa-cloudbuild.iam.gserviceaccount.com"]
   }
 }
@@ -36,6 +36,7 @@ resource "google_cloudbuildv2_connection" "my-connection" {
   location = var.REGION
   name = "tf-test-connection"
   github_config {
+    #TODO Make ID a var
     app_installation_id = 71615909
 
     authorizer_credential {
