@@ -3,6 +3,11 @@ provider "google" {
   region  = var.REGION
 }
 
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "my-context"
+}
+
 #Accounts - normally separate from CI/CD / separate process
 resource "google_service_account" "default" {
   account_id   = "gke-service-account-id"
@@ -14,7 +19,8 @@ resource "google_project_iam_member" "storage_admin_member" {
     for_each = toset([
     "roles/storage.admin",
     "roles/artifactregistry.writer",
-    "roles/logging.logWriter"
+    "roles/logging.logWriter",
+    "roles/container.admin",
   ])
   role    = each.key
   member  = "serviceAccount:${google_service_account.default.email}"

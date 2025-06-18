@@ -66,11 +66,31 @@ resource "google_cloudbuild_trigger" "build-trigger" {
     options {
       logging = "CLOUD_LOGGING_ONLY"
     }
+    # step {
+    #   name = "node"
+    #   entrypoint = "npm"
+    #   args = ["install"]
+    # }
+    # step {
+    #   name = "node"
+    #   entrypoint = "npm"
+    #   args = ["test"]
+    # }
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = ["build", "-t", "us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage", "."]
+      args = ["build", "-t", "us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage:latest", "."]
     }
-    images = ["us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage"]
+    step {
+      name = "gcr.io/cloud-builders/kubectl"
+      args = ["apply", "-f", "k8s/"]
+      env = ["CLOUDSDK_COMPUTE_ZONE=us-east1", "CLOUDSDK_CONTAINER_CLUSTER=gke-terraformcluster"]
+    }
+    step {
+      name = "gcr.io/cloud-builders/kubectl"
+      args = ["set", "image", "deployment", "expressapiapp", "expressapiapp=us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage::latest"]
+      env = ["CLOUDSDK_COMPUTE_ZONE=us-east1", "CLOUDSDK_CONTAINER_CLUSTER=gke-terraformcluster"]
+    }
+    images = ["us-east1-docker.pkg.dev/${var.PROJECT_ID}/my-repository/myimage::latest"]
   }
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 }
